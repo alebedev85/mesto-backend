@@ -1,37 +1,45 @@
-const users = [];
-let id = 0;
+const usersModel = require('../models/user');
 
 const getUsers = (req, res) => {
-  console.log('GET');
-  res.send(users);
+  usersModel.find({})
+    .then((users) => {
+      res.send(users);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
 
 const getUserById = (req, res) => {
-  console.log('GET');
-
-  const user = users.find((u) => u.id === Number(req.params.user_id));
-
-  if (!user) {
-    res.status(404).send({ message: 'User not found' });
-    return;
-  }
-
-  res.send(user);
+  usersModel.findById(req.params.user_id)
+    .then((users) => {
+      res.send(users);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
 
 const postUser = (req, res) => {
-  console.log('POST');
-  id += 1;
-
-  const newUser = {
-    ...req.body,
-    id,
-  };
-  users.push(newUser);
-
-  console.log(users);
-
-  res.send(newUser);
+  usersModel.create(req.body)
+    .then((users) => {
+      res.status(201).send(users);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
 
 module.exports = {
