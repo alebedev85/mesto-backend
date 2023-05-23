@@ -1,7 +1,7 @@
-const usersModel = require('../models/card');
+const cardsModel = require('../models/card');
 
 const getCards = (req, res) => {
-  usersModel.find({})
+  cardsModel.find({})
     .then((cards) => {
       res.send(cards);
     })
@@ -15,7 +15,7 @@ const getCards = (req, res) => {
 };
 
 const creatCard = (req, res) => {
-  usersModel.create({
+  cardsModel.create({
     owner: req.user._id,
     ...req.body,
   })
@@ -32,11 +32,55 @@ const creatCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  usersModel.findByIdAndRemove(req.params.cardId)
+  cardsModel.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
       throw new Error('Notfound');
     })
-    .then(card => res.send({ message: "Пост удалён" }))
+    .then(() => res.send({ message: "Пост удалён" }))
+    .catch((err) => {
+      if (err.message === 'Notfound') {
+        res.status(404).send({ message: 'Card not found' });
+        return;
+      };
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
+};
+
+const likeCard = (req, res) => {
+  cardsModel.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  ).orFail(() => {
+    throw new Error('Notfound');
+  })
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.message === 'Notfound') {
+        res.status(404).send({ message: 'Card not found' });
+        return;
+      };
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
+};
+
+const dislikeCard = (req, res) => {
+  cardsModel.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { new: true },
+  ).orFail(() => {
+    throw new Error('Notfound');
+  })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.message === 'Notfound') {
         res.status(404).send({ message: 'Card not found' });
@@ -54,4 +98,6 @@ module.exports = {
   getCards,
   creatCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };
