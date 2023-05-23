@@ -31,7 +31,27 @@ const creatCard = (req, res) => {
     });
 };
 
+const deleteCard = (req, res) => {
+  usersModel.findByIdAndRemove(req.params.cardId)
+    .orFail(() => {
+      throw new Error('Notfound');
+    })
+    .then(card => res.send({ message: "Пост удалён" }))
+    .catch((err) => {
+      if (err.message === 'Notfound') {
+        res.status(404).send({ message: 'Card not found' });
+        return;
+      };
+      res.status(500).send({
+        message: 'Internal Server Error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
+};
+
 module.exports = {
   getCards,
   creatCard,
+  deleteCard,
 };
