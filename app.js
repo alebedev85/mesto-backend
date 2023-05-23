@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   req.user = {
-    _id: new mongoose.Types.ObjectId('646b5e4f2af31baf466ac309'),
+    _id: new mongoose.Types.ObjectId('646c77bd5221449462a62c29'),
   };
   next();
 });

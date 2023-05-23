@@ -7,4 +7,8 @@ router.get('/:userId', userController.getUserById);
 
 router.post('/', userController.postUser);
 
+router.patch('/me', userController.edithUser);
+
+router.patch('/me/avatar', userController.editAvatarhUser);
+
 module.exports = router;
