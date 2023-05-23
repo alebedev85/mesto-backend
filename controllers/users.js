@@ -15,11 +15,18 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res) => {
-  usersModel.findById(req.params.user_id)
-    .then((users) => {
-      res.send(users);
+  usersModel.findById(req.params.userId)
+    .orFail(() => {
+      throw new Error('Notfound');
+    })
+    .then((user) => {
+      res.send(user);
     })
     .catch((err) => {
+      if (err.message === 'Notfound') {
+        res.status(404).send({ message: 'User not found' });
+        return;
+      };
       res.status(500).send({
         message: 'Internal Server Error',
         err: err.message,

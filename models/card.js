@@ -4,16 +4,24 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 4,
+    minlength: 2,
+    maxlength: 30,
   },
-  image: {
+  link: {
     type: String,
     required: true,
-    minlength: 4,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+  },
+  likes: {
+    type: Array,
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   }
 });
 
